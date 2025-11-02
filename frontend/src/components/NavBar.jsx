@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom"
 import "../css/Navbar.css"
+import { useAuth } from '../contexts/AuthContext'
 function NavBar(){
 return <nav className="navbar">
     <div className="navbar-brand">
