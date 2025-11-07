@@ -23,14 +23,22 @@ export const AuthProvider = ({ children }) => {
   const openAuth = (mode = 'login') => { setAuthMode(mode); setAuthModalOpen(true) }
   const closeAuth = () => setAuthModalOpen(false)
 
-  return (
-    <AuthContext.Provider value={{
-      user, login, signup, logout,
-      authModalOpen, authMode, openAuth, closeAuth
-    }}>
-      {children}
-    </AuthContext.Provider>
-  )
+return (
+  <AuthContext.Provider
+    value={{
+      user,
+      login,
+      signup,
+      logout,
+      authModalOpen,
+      authMode,
+      openAuth,
+      closeAuth,
+      setAuthMode, 
+    }}
+  >
+    {children}
+  </AuthContext.Provider>
+)
 }
-
 export const useAuth = () => useContext(AuthContext)

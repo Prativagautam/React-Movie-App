@@ -16,13 +16,13 @@ export default function Favorites() {
   return (
     <div className="favorites-page">
       <h2>My Favorites</h2>
-      <div className="movie-grid">
+      <div className="movie-grid flex ">
         {favorites.length > 0 ? (
           favorites.map((movie) => (
             <MovieCard key={movie.id} movie={movie} />
           ))
         ) : (
-          <p>No favorites added yet.</p>
+          <p className="text-red-900">No favorites added yet.</p>
         )}
       </div>
     </div>
