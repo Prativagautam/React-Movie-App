@@ -51,14 +51,15 @@ export default function AuthModal() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className=" flex flex-col gap-4 space-y-6 w-full max-w-sm">
-            
+          {/* <form onSubmit={handleSubmit(onSubmit)} className=" flex flex-col gap-4 space-y-6 w-full max-w-sm"> */}
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 w-full max-w-sm">
+
             {/* Username Field - Only for Signup */}
             {authMode === 'signup' && (
               <div>
                 <input
                   {...register('username', { required: 'Username is required' })}
-                  placeholder="Username"
+                  placeholder="     Username"
                   className="w-full px-6 py-5 bg-gray-800/50 text-white placeholder-gray-500 rounded-2xl border-2 border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 focus:bg-gray-800/70 transition-all duration-200 text-base"
                 />
                 {errors.username && (
@@ -77,7 +78,7 @@ export default function AuthModal() {
                     message: 'Please enter a valid email',
                   },
                 })}
-                placeholder="Email address"
+                placeholder="   Email address"
                 className="w-full px-6 py-5 bg-gray-800/50 text-white placeholder-gray-500 rounded-2xl border-2 border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 focus:bg-gray-800/70 transition-all duration-200 text-base"
               />
               {errors.email && (
@@ -93,7 +94,7 @@ export default function AuthModal() {
                   required: 'Password is required',
                   minLength: { value: 6, message: 'Password must be at least 6 characters' },
                 })}
-                placeholder="Password"
+                placeholder="   Password"
                 className="w-full px-6 py-5 bg-gray-800/50 text-white placeholder-gray-500 rounded-2xl border-2 border-gray-700/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 focus:bg-gray-800/70 transition-all duration-200 text-base"
               />
               {errors.password && (
@@ -108,20 +109,22 @@ export default function AuthModal() {
             >
               {authMode === 'login' ? 'Login' : 'Sign Up'}
             </button>
+            <p></p>
           </form>
 
           {/* Switch Auth Mode */}
           <div className="text-center mt-8 w-full max-w-sm">
-            <p className="text-gray-400 text-sm">
-              {authMode === 'login' ? "Don't have an account?" : 'Already have an account?'}{' '}
+           <p className="text-gray-400 text-sm">
+             {authMode === 'login' ? "Don't have an account?" : 'Already have an account?'}
+               <span> </span>
               <button
                 type="button"
-                className="text-blue-600 font-semibold hover:text-blue-300 transition-colors duration-200 ml-1"
+                className="text-blue-600 font-semibold hover:text-blue-300 transition-colors duration-200"
                 onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')}
-              >
-                {authMode === 'login' ? 'Sign up' : 'Login'}
-              </button>
-            </p>
+             >
+            {authMode === 'login' ? 'Sign up' : 'Login'}
+            </button>
+           </p>
           </div>
 
           {/* Terms */}
