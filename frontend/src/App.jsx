@@ -1,25 +1,29 @@
-
 import './css/App.css'
 import Favorites from './pages/Favorites'
-// component is any fx in js that returns jsx code.starts with capital letter
-// while returning it needs to have just one parent element so we use fragment
 import Home from './pages/Home'
-import {Routes,Route} from "react-router-dom"
-import {MovieProvider} from "./contexts/MovieContext"
-import NavBar from "./components/NavBar"
+import { Routes, Route } from "react-router-dom"
+import { MovieProvider } from "./contexts/MovieContext"
+import { AuthProvider } from "./contexts/AuthContext"   
+import MovieDetails from "./pages/MovieDetails";
+
+
 function App() {
   return (
-    <MovieProvider>
-     <NavBar/>
-     <main className="main-content">
-      <Routes>
-        <Route path="/" element={<Home/>}/>
-        <Route path="/favorites" element={<Favorites/>}/>
-      </Routes>
-     </main>
-    </MovieProvider>
+    <AuthProvider> 
+      <MovieProvider>
+        {/* Removed NavBar - it's now integrated into each page */}
+     
+
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/favorites" element={<Favorites />} />
+          <Route path="/movie/:id" element={<MovieDetails />} />
+        </Routes>
+      </MovieProvider>
+    </AuthProvider>
   )
 }
-// props means property we can add it to customize same like passing parameters
 
 export default App
+
+
