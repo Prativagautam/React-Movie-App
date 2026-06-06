@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 // import { searchMovies, getPopularMovies } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import { useMovieContext } from "../contexts/MovieContext";
-import AuthModal from "../components/Authmodal";
+import AuthModal from "../components/auth/Authmodal";
 import { Search } from "lucide-react";
 
 import { 
@@ -16,7 +16,7 @@ import {
   searchTVSeries,
   getTVSeriesByGenre 
 } from "../services/api";
-import MovieCard from "../components/MovieCard"; // Add this import
+import MovieCard from "../components/movie/MovieCard"; // Add this import
 export default function Home() {
      const movieGenreMap = {
      "Trending": null,

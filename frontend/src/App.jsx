@@ -12,8 +12,6 @@ function App() {
     <AuthProvider> 
       <MovieProvider>
         {/* Removed NavBar - it's now integrated into each page */}
-     
-
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/favorites" element={<Favorites />} />

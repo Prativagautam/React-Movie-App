@@ -2,7 +2,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import AuthModal from "../components/Authmodal";
+import AuthModal from "../components/auth/Authmodal";
 
 export default function MovieDetails() {
   const { id } = useParams();

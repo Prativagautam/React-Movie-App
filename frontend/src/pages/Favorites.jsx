@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useMovieContext } from "../contexts/MovieContext";
-import AuthModal from "../components/Authmodal";
+import AuthModal from "../components/auth/Authmodal";
 export default function Favorites() {
   const navigate = useNavigate();
   const { user, openAuth, logout } = useAuth();
