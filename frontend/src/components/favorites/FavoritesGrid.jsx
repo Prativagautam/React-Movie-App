@@ -1,4 +1,10 @@
 export function FavoritesGrid({ favorites, onMovieClick, onRemoveFavorite }) {
+  const handleRemoveClick = (event, movieId) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onRemoveFavorite(event, movieId);
+  };
+
   return (
     <div className="movie-grid" style={{ display: "grid", gap: "1rem" }}>
       {favorites.map((movie) => (
@@ -46,11 +52,12 @@ export function FavoritesGrid({ favorites, onMovieClick, onRemoveFavorite }) {
 
             <button
               type="button"
-              onClick={(e) => onRemoveFavorite(e, movie.id)}
+              onClick={(e) => handleRemoveClick(e, movie.id)}
               style={{
                 position: "absolute",
                 top: "0.5rem",
                 right: "0.5rem",
+                zIndex: 20,
                 backgroundColor: "#ef4444",
                 color: "white",
                 border: "none",
