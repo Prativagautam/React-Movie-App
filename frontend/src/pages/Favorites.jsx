@@ -14,8 +14,9 @@ export default function Favorites() {
   const { user, openAuth, logout } = useAuth();
   const { favorites, removeFromFavorites } = useMovieContext();
 
-  const handleMovieClick = (movieId) => {
-    navigate(`/movie/${movieId}`);
+  const handleMovieClick = (item) => {
+    const isSeries = item.media_type === "tv" || item.first_air_date || item.name;
+    navigate(isSeries ? `/tv/${item.id}` : `/movie/${item.id}`);
   };
 
   const handleRemoveFavorite = (e, movieId) => {

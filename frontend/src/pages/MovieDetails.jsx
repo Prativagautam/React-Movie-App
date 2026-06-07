@@ -1,9 +1,10 @@
 
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useMovieContext } from "../contexts/MovieContext";
 import AuthModal from "../components/auth/Authmodal";
-import { getMovieDetails, getMovieReviews } from "../services/api";
+import { getMovieDetails, getMovieReviews, getTVDetails, getTVReviews } from "../services/api";
 import MovieDetailsHero from "../components/movie/MovieDetailsHero";
 import TmdbReviews from "../components/movie/TmdbReviews";
 
@@ -20,11 +21,16 @@ const getStoredMovieReviews = () => {
 export default function MovieDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, openAuth, logout } = useAuth();
+  const { isFavorite, addToFavorites, removeFromFavorites } = useMovieContext();
+  const contentType = location.pathname.startsWith("/tv/") ? "tv" : "movie";
+  const reviewStorageKey = `${contentType}_${id}`;
 
   // ---------- movie + tmdb reviews ----------
   const [movie, setMovie] = useState(null);
   const [tmdbReviews, setTmdbReviews] = useState([]);
+  const [detailsError, setDetailsError] = useState(null);
 
   // ---------- local (app) reviews ----------
   const [localReviews, setLocalReviews] = useState([]);
@@ -46,38 +52,52 @@ export default function MovieDetails() {
   const [sortBy, setSortBy] = useState("newest");
 
   const genId = () => `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+  const favorite = movie ? isFavorite(movie.id) : false;
 
   // ---------- fetch movie & tmdb reviews ----------
   useEffect(() => {
-    const loadMovieDetails = async () => {
-      try {
-        const [movieData, reviewData] = await Promise.all([
-          getMovieDetails(id),
-          getMovieReviews(id),
-        ]);
+    let ignoreResponse = false;
 
+    const loadMovieDetails = async () => {
+      setMovie(null);
+      setDetailsError(null);
+
+      try {
+        const [movieData, reviewData] = await Promise.all(
+          contentType === "tv"
+            ? [getTVDetails(id), getTVReviews(id)]
+            : [getMovieDetails(id), getMovieReviews(id)]
+        );
+
+        if (ignoreResponse) return;
         setMovie(movieData);
         setTmdbReviews(reviewData);
       } catch (err) {
+        if (ignoreResponse) return;
         console.error("Movie details fetch error:", err);
+        setDetailsError("Unable to load details for this title.");
       }
     };
 
     loadMovieDetails();
-  }, [id]);
+
+    return () => {
+      ignoreResponse = true;
+    };
+  }, [id, contentType]);
 
   // ---------- load local reviews from localStorage ----------
   useEffect(() => {
     const stored = getStoredMovieReviews();
-    setLocalReviews(stored[id] || []);
-  }, [id]);
+    setLocalReviews(stored[reviewStorageKey] || []);
+  }, [reviewStorageKey]);
 
   // persist local reviews to localStorage
   useEffect(() => {
     const stored = getStoredMovieReviews();
-    stored[id] = localReviews;
+    stored[reviewStorageKey] = localReviews;
     localStorage.setItem(MOVIE_REVIEWS_STORAGE_KEY, JSON.stringify(stored));
-  }, [localReviews, id]);
+  }, [localReviews, reviewStorageKey]);
 
   // ---------- derived values ----------
   const averageLocalRating = useMemo(() => {
@@ -102,6 +122,20 @@ export default function MovieDetails() {
       return false;
     }
     return true;
+  };
+
+  const toggleFavorite = () => {
+    if (!requireAuth() || !movie) return;
+
+    if (favorite) {
+      removeFromFavorites(movie.id);
+      return;
+    }
+
+    addToFavorites({
+      ...movie,
+      media_type: contentType,
+    });
   };
 
   const addLocalReview = () => {
@@ -226,6 +260,10 @@ export default function MovieDetails() {
     );
   };
 
+  if (detailsError) {
+    return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: '#111827', color: 'white' }}>{detailsError}</div>;
+  }
+
   if (!movie) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: '#111827', color: 'white' }}>Loading...</div>;
 
   return (
@@ -293,6 +331,8 @@ export default function MovieDetails() {
           movie={movie}
           averageLocalRating={averageLocalRating}
           reviewCount={localReviews.length}
+          favorite={favorite}
+          onFavoriteClick={toggleFavorite}
         />
 
         {/* Reviews Sections */}

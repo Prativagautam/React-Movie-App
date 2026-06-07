@@ -82,6 +82,12 @@ export default function Home() {
 
   const genres = getGenresForTab(activeTab);
 
+  useEffect(() => {
+    if (!getGenresForTab(activeTab).includes(activeGenre)) {
+      setActiveGenre("Trending");
+    }
+  }, [activeGenre, activeTab]);
+
   // Debouncing effect for search - waits 500ms after user stops typing
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -92,8 +98,13 @@ export default function Home() {
   }, [searchQuery]);
 
   useEffect(() => {
+    let ignoreResponse = false;
+
     const loadContent = async () => {
       setLoading(true);
+      setError(null);
+      setContentItems([]);
+      setFeaturedContent([]);
 
       try {
         const trimmedQuery = debouncedQuery.trim();
@@ -101,6 +112,7 @@ export default function Home() {
 
         if (trimmedQuery) {
           content = await searchContent(activeTab, trimmedQuery);
+          if (ignoreResponse) return;
           setFeaturedContent([]);
         } else {
           const genreMap = getGenreMapForTab(activeTab);
@@ -112,24 +124,34 @@ export default function Home() {
             content = await getContentByGenre(activeTab, genreId);
           }
 
+          if (ignoreResponse) return;
           setFeaturedContent(content.slice(0, 2));
         }
 
+        if (ignoreResponse) return;
         setContentItems(content);
         setError(null);
       } catch (err) {
+        if (ignoreResponse) return;
         console.error(err);
         setError("Failed to load content...");
       } finally {
-        setLoading(false);
+        if (!ignoreResponse) {
+          setLoading(false);
+        }
       }
     };
 
     loadContent();
+
+    return () => {
+      ignoreResponse = true;
+    };
   }, [activeGenre, debouncedQuery, activeTab]);
 
-  const handleMovieClick = (movieId) => {
-    navigate(`/movie/${movieId}`);
+  const handleContentClick = (item) => {
+    const isSeries = activeTab === "Series" || item.media_type === "tv";
+    navigate(isSeries ? `/tv/${item.id}` : `/movie/${item.id}`);
   };
 
   const handleLogout = () => {
@@ -146,7 +168,10 @@ export default function Home() {
     if (isFavorite(movie.id)) {
       removeFromFavorites(movie.id);
     } else {
-      addToFavorites(movie);
+      addToFavorites({
+        ...movie,
+        media_type: activeTab === "Series" ? "tv" : "movie",
+      });
     }
   };
 
@@ -618,7 +643,7 @@ export default function Home() {
         {!searchQuery && (
           <FeaturedContent
             featuredContent={featuredContent}
-            onContentClick={handleMovieClick}
+            onContentClick={handleContentClick}
             onToggleFavorite={toggleFavorite}
             isFavorite={isFavorite}
           />

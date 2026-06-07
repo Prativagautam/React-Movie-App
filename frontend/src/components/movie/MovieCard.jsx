@@ -18,7 +18,12 @@ function MovieCard({ movie, contentType = "movie" }) {
     }
     
     if (favorite) removeFromFavorites(movie.id);
-    else addToFavorites(movie);
+    else {
+      addToFavorites({
+        ...movie,
+        media_type: contentType === "Series" ? "tv" : "movie",
+      });
+    }
   }
 
   // Determine route based on content type

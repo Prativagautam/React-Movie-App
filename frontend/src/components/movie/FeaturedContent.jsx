@@ -14,7 +14,7 @@ export function FeaturedContent({
         {featuredContent.map((movie) => (
           <div
             key={movie.id}
-            onClick={() => onContentClick(movie.id)}
+            onClick={() => onContentClick(movie)}
             style={{
               position: "relative",
               height: "16rem",

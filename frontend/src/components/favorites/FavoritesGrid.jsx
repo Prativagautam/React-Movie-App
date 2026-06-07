@@ -11,7 +11,7 @@ export function FavoritesGrid({ favorites, onMovieClick, onRemoveFavorite }) {
         <div
           key={movie.id}
           style={{ cursor: "pointer", position: "relative" }}
-          onClick={() => onMovieClick(movie.id)}
+          onClick={() => onMovieClick(movie)}
         >
           <div
             style={{

@@ -72,8 +72,18 @@ export const getTVSeriesByGenre = async (genreId) => {
 }
 // Get TV series details
 export const getTVDetails = async (id) => {
-  const res = await api.get(`/tv/${id}`)
+  const res = await api.get(`/tv/${id}`, {
+    params: { language: 'en-US' },
+  })
   return res.data
+}
+
+// Get TMDB reviews for a TV series
+export const getTVReviews = async (id) => {
+  const res = await api.get(`/tv/${id}/reviews`, {
+    params: { language: 'en-US' },
+  })
+  return res.data.results || []
 }
 
 // Get TV series credits
