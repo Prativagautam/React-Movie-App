@@ -1,13 +1,10 @@
 
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-// import { searchMovies, getPopularMovies } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import { useMovieContext } from "../contexts/MovieContext";
 import AuthModal from "../components/auth/Authmodal";
 import { Search } from "lucide-react";
-
 import { 
   searchMovies, 
   getPopularMovies, 
@@ -16,30 +13,46 @@ import {
   searchTVSeries,
   getTVSeriesByGenre 
 } from "../services/api";
-import MovieCard from "../components/movie/MovieCard"; // Add this import
+import MovieCard from "../components/movie/MovieCard";
+
+const CONTENT_TABS = ["Movie", "Series", "Originals"];
+
+const MOVIE_GENRES = {
+  Trending: null,
+  Action: 28,
+  Romance: 10749,
+  Animation: 16,
+  Horror: 27,
+  Special: 878,
+  Drama: 18,
+};
+
+const TV_GENRES = {
+  Trending: null,
+  Drama: 18,
+  "Action & Adventure": 10759,
+  Comedy: 35,
+  Animation: 16,
+  "Sci-Fi & Fantasy": 10765,
+  Documentary: 99,
+};
+
+const getGenresForTab = (activeTab) =>
+  activeTab === "Series" ? Object.keys(TV_GENRES) : Object.keys(MOVIE_GENRES);
+
+const getGenreMapForTab = (activeTab) =>
+  activeTab === "Series" ? TV_GENRES : MOVIE_GENRES;
+
+const getPopularContent = (activeTab) =>
+  activeTab === "Series" ? getPopularTVSeries() : getPopularMovies();
+
+const searchContent = (activeTab, query) =>
+  activeTab === "Series" ? searchTVSeries(query) : searchMovies(query);
+
+const getContentByGenre = (activeTab, genreId) =>
+  activeTab === "Series" ? getTVSeriesByGenre(genreId) : getMoviesByGenre(genreId);
+
 export default function Home() {
-     const movieGenreMap = {
-     "Trending": null,
-     "Action": 28,
-     "Romance": 10749,
-     "Animation": 16,
-     "Horror": 27,
-     "Special": 878,
-    "Drama": 18
-     };
-
-     const tvGenreMap = {
-    "Trending": null,
-    "Drama": 18,
-    "Action & Adventure": 10759,
-    "Comedy": 35,
-    "Animation": 16,
-    "Sci-Fi & Fantasy": 10765,
-    "Documentary": 99
-    };
-
-
-
   const navigate = useNavigate();
   const { user, openAuth, logout } = useAuth();
   const { favorites, isFavorite, addToFavorites, removeFromFavorites } = useMovieContext();
@@ -61,62 +74,7 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
-  const tabs = ["Movie", "Series", "Originals"];
-  //const genres = ["Trending", "Action", "Romance", "Animation", "Horror", "Special", "Drama"];
-  const getGenres = () => {
-  if (activeTab === "Series") {
-    return ["Trending", "Drama", "Action & Adventure", "Comedy", "Animation", "Sci-Fi & Fantasy", "Documentary"];
-  } else {
-    return ["Trending", "Action", "Romance", "Animation", "Horror", "Special", "Drama"];
-  }
-};
-
-// Then use it in your component:
-const genres = getGenres();
-
-  // Load popular movies on mount
-  // useEffect(() => {
-  //   const loadPopularMovies = async () => {
-  //     try {
-  //       const popularMovies = await getPopularMovies();
-  //       setMovies(popularMovies);
-  //       setFeaturedMovies(popularMovies.slice(0, 2));
-  //     } catch (err) {
-  //       console.error(err);
-  //       setError("Failed to load movies...");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   loadPopularMovies();
-  // }, []);
-  useEffect(() => {
-  const loadPopularContent = async () => {
-    try {
-      let popularContent;
-      
-      if (activeTab === "Movie") {
-        popularContent = await getPopularMovies();
-      } else if (activeTab === "Series") {
-        popularContent = await getPopularTVSeries();
-      } else {
-        // For "Originals" - use movies for now, or you can create a custom category later
-        popularContent = await getPopularMovies();
-      }
-      
-      setMovies(popularContent);
-      setFeaturedMovies(popularContent.slice(0, 2));
-      setError(null);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load content...");
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  loadPopularContent();
-}, [activeTab]); // Add activeTab as dependency
+  const genres = getGenresForTab(activeTab);
 
   // Debouncing effect for search - waits 500ms after user stops typing
   useEffect(() => {
@@ -127,61 +85,31 @@ const genres = getGenres();
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Search effect - runs when debounced query changes
-  // useEffect(() => {
-  //   if (!debouncedQuery.trim()) {
-  //     const loadPopularMovies = async () => {
-  //       setLoading(true);
-  //       try {
-  //         const popularMovies = await getPopularMovies();
-  //         setMovies(popularMovies);
-  //         setFeaturedMovies(popularMovies.slice(0, 2));
-  //         setError(null);
-  //       } catch (err) {
-  //         console.error(err);
-  //         setError("Failed to load movies...");
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     };
-  //     loadPopularMovies();
-  //     return;
-  //   }
-
-  //   const performSearch = async () => {
-  //     setLoading(true);
-  //     try {
-  //       const searchResults = await searchMovies(debouncedQuery);
-  //       setMovies(searchResults);
-  //       setFeaturedMovies([]);
-  //       setError(null);
-  //     } catch (err) {
-  //       console.error(err);
-  //       setError("Failed to search movies...");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   performSearch();
-  // }, [debouncedQuery]);
-  // Search effect - runs when debounced query changes
-useEffect(() => {
-  if (!debouncedQuery.trim()) {
-    const loadPopularContent = async () => {
+  useEffect(() => {
+    const loadContent = async () => {
       setLoading(true);
+
       try {
-        let popularContent;
-        if (activeTab === "Movie") {
-          popularContent = await getPopularMovies();
-        } else if (activeTab === "Series") {
-          popularContent = await getPopularTVSeries();
+        const trimmedQuery = debouncedQuery.trim();
+        let content;
+
+        if (trimmedQuery) {
+          content = await searchContent(activeTab, trimmedQuery);
+          setFeaturedMovies([]);
         } else {
-          popularContent = await getPopularMovies();
+          const genreMap = getGenreMapForTab(activeTab);
+          const genreId = genreMap[activeGenre] ?? null;
+
+          if (genreId === null) {
+            content = await getPopularContent(activeTab);
+          } else {
+            content = await getContentByGenre(activeTab, genreId);
+          }
+
+          setFeaturedMovies(content.slice(0, 2));
         }
-        
-        setMovies(popularContent);
-        setFeaturedMovies(popularContent.slice(0, 2));
+
+        setMovies(content);
         setError(null);
       } catch (err) {
         console.error(err);
@@ -190,110 +118,9 @@ useEffect(() => {
         setLoading(false);
       }
     };
-    loadPopularContent();
-    return;
-  }
 
-  const performSearch = async () => {
-    setLoading(true);
-    try {
-      let searchResults;
-      if (activeTab === "Movie") {
-        searchResults = await searchMovies(debouncedQuery);
-      } else if (activeTab === "Series") {
-        searchResults = await searchTVSeries(debouncedQuery);
-      } else {
-        searchResults = await searchMovies(debouncedQuery);
-      }
-      
-      setMovies(searchResults);
-      setFeaturedMovies([]);
-      setError(null);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to search...");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  performSearch();
-}, [debouncedQuery, activeTab]);
-  // Load movies when genre changes
-// useEffect(() => {
-//   if (searchQuery) return; // Don't load if user is searching
-  
-//   const loadMoviesByGenre = async () => {
-//     setLoading(true);
-//     try {
-//       let genreMovies;
-//       const genreId = genreMap[activeGenre];
-      
-//       if (genreId === null) {
-//         // Load popular movies for "Trending"
-//         genreMovies = await getPopularMovies();
-//       } else {
-//         // Load movies by specific genre
-//         genreMovies = await getMoviesByGenre(genreId);
-//       }
-      
-//       setMovies(genreMovies);
-//       setFeaturedMovies(genreMovies.slice(0, 2));
-//       setError(null);
-//     } catch (err) {
-//       console.error(err);
-//       setError("Failed to load movies...");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-  
-//   loadMoviesByGenre();
-// }, [activeGenre, searchQuery]);
-// Load content when genre changes
-useEffect(() => {
-  if (searchQuery) return;
-
-  const loadContentByGenre = async () => {
-    setLoading(true);
-    try {
-      let genreContent;
-      const currentGenreMap = activeTab === "Series" ? tvGenreMap : movieGenreMap;
-      const genreId = currentGenreMap[activeGenre];
-      
-      if (genreId === null) {
-        // Load popular content
-        if (activeTab === "Movie") {
-          genreContent = await getPopularMovies();
-        } else if (activeTab === "Series") {
-          genreContent = await getPopularTVSeries();
-        } else {
-          genreContent = await getPopularMovies();
-        }
-      } else {
-        // Load content by specific genre
-        if (activeTab === "Movie") {
-          genreContent = await getMoviesByGenre(genreId);
-        } else if (activeTab === "Series") {
-          genreContent = await getTVSeriesByGenre(genreId);
-        } else {
-          genreContent = await getMoviesByGenre(genreId);
-        }
-      }
-      
-      setMovies(genreContent);
-      setFeaturedMovies(genreContent.slice(0, 2));
-      setError(null);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load content...");
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  loadContentByGenre();
-}, [activeGenre, searchQuery, activeTab]);
+    loadContent();
+  }, [activeGenre, debouncedQuery, activeTab]);
 
   const handleMovieClick = (movieId) => {
     navigate(`/movie/${movieId}`);
@@ -339,7 +166,7 @@ useEffect(() => {
            {/* Desktop Navigation */}
 <nav className="hidden desktop-nav">
   <div className="flex items-center gap-2">
-    {tabs.map((tab) => (
+    {CONTENT_TABS.map((tab) => (
       <button
         key={tab}
         onClick={() => setActiveTab(tab)}
@@ -487,7 +314,7 @@ useEffect(() => {
           {mobileMenuOpen && (
             <div className="mobile-menu" style={{ marginTop: '1rem' }}>
               <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
-                {tabs.map((tab) => (
+                {CONTENT_TABS.map((tab) => (
                   <button
                     key={tab}
                     onClick={() => {
@@ -628,7 +455,7 @@ useEffect(() => {
       {!searchQuery && (
   <section className="mb-8">
     <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2 w-full">
-      {getGenres().map((genre) => {
+      {genres.map((genre) => {
         const isActive = activeGenre === genre;
         return (
           <button
@@ -655,12 +482,6 @@ useEffect(() => {
     </div>
   </section>
 )}
-         
- 
-
-        
- 
-
         {/* Results Header */}
         <section style={{ marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -704,9 +525,7 @@ useEffect(() => {
       ))}
     </div>
   </section>
-)}
-
-       
+)}     
         {/* No Results */}
         {!loading && movies.length === 0 && searchQuery && (
           <div style={{ textAlign: 'center', padding: '5rem 0' }}>
@@ -716,7 +535,6 @@ useEffect(() => {
           </div>
         )}
       </main>
-
       <style>{`
         @keyframes spin {
           to { transform: rotate(360deg); }

@@ -16,6 +16,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/movie/:id" element={<MovieDetails />} />
+          {/* TODO: Add a fallback route */}
+          {/* <Route path="*" element={<NotFound />} /> */}
         </Routes>
       </MovieProvider>
     </AuthProvider>
