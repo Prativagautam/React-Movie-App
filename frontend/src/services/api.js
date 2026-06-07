@@ -19,6 +19,22 @@ export const searchMovies = async (query) => {
   return res.data.results
 }
 
+// Get movie details by id
+export const getMovieDetails = async (id) => {
+  const res = await api.get(`/movie/${id}`, {
+    params: { language: 'en-US' },
+  })
+  return res.data
+}
+
+// Get TMDB reviews for a movie
+export const getMovieReviews = async (id) => {
+  const res = await api.get(`/movie/${id}/reviews`, {
+    params: { language: 'en-US' },
+  })
+  return res.data.results || []
+}
+
 // Get movies by genre
 export const getMoviesByGenre = async (genreId) => {
   const res = await api.get('/discover/movie', { 

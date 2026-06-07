@@ -3,6 +3,19 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import AuthModal from "../components/auth/Authmodal";
+import { getMovieDetails, getMovieReviews } from "../services/api";
+import MovieDetailsHero from "../components/movie/MovieDetailsHero";
+import TmdbReviews from "../components/movie/TmdbReviews";
+
+const MOVIE_REVIEWS_STORAGE_KEY = "movieReviews";
+
+const getStoredMovieReviews = () => {
+  try {
+    return JSON.parse(localStorage.getItem(MOVIE_REVIEWS_STORAGE_KEY)) || {};
+  } catch {
+    return {};
+  }
+};
 
 export default function MovieDetails() {
   const { id } = useParams();
@@ -32,37 +45,38 @@ export default function MovieDetails() {
   // sorting for local reviews
   const [sortBy, setSortBy] = useState("newest");
 
-  const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
-  const API_URL = import.meta.env.VITE_TMDB_API_URL;
-
   const genId = () => `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
   // ---------- fetch movie & tmdb reviews ----------
   useEffect(() => {
-    if (!API_URL || !API_KEY) return;
+    const loadMovieDetails = async () => {
+      try {
+        const [movieData, reviewData] = await Promise.all([
+          getMovieDetails(id),
+          getMovieReviews(id),
+        ]);
 
-    fetch(`${API_URL}/movie/${id}?api_key=${API_KEY}&language=en-US`)
-      .then((res) => res.json())
-      .then((data) => setMovie(data))
-      .catch((err) => console.error("Movie fetch error:", err));
+        setMovie(movieData);
+        setTmdbReviews(reviewData);
+      } catch (err) {
+        console.error("Movie details fetch error:", err);
+      }
+    };
 
-    fetch(`${API_URL}/movie/${id}/reviews?api_key=${API_KEY}&language=en-US`)
-      .then((res) => res.json())
-      .then((data) => setTmdbReviews(data.results || []))
-      .catch((err) => console.error("TMDB reviews fetch error:", err));
-  }, [id, API_KEY, API_URL]);
+    loadMovieDetails();
+  }, [id]);
 
   // ---------- load local reviews from localStorage ----------
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("movieReviews")) || {};
+    const stored = getStoredMovieReviews();
     setLocalReviews(stored[id] || []);
   }, [id]);
 
   // persist local reviews to localStorage
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("movieReviews")) || {};
+    const stored = getStoredMovieReviews();
     stored[id] = localReviews;
-    localStorage.setItem("movieReviews", JSON.stringify(stored));
+    localStorage.setItem(MOVIE_REVIEWS_STORAGE_KEY, JSON.stringify(stored));
   }, [localReviews, id]);
 
   // ---------- derived values ----------
@@ -275,73 +289,16 @@ export default function MovieDetails() {
       {/* Main Content */}
       <main style={{ padding: '2rem 1rem', maxWidth: '1280px', margin: '0 auto' }}>
         {/* Movie Info Section */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', marginBottom: '3rem' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '2rem' }} className="movie-details-grid">
-            <img 
-              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
-              alt={movie.title} 
-              style={{ width: '100%', maxWidth: '300px', borderRadius: '1rem', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)' }} 
-            />
-            <div>
-              <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '1rem' }}>{movie.title}</h1>
-              <p style={{ color: '#d1d5db', marginBottom: '1.5rem', lineHeight: '1.75' }}>{movie.overview}</p>
-
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', marginBottom: '1.5rem' }}>
-                <div>
-                  <div style={{ fontSize: '0.875rem', color: '#9ca3af', marginBottom: '0.25rem' }}>TMDB Rating</div>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#fbbf24' }}>
-                    ⭐ {movie.vote_average.toFixed(1)} <span style={{ fontSize: '1rem', color: '#9ca3af' }}>/ 10</span>
-                  </div>
-                </div>
-
-                <div>
-                  <div style={{ fontSize: '0.875rem', color: '#9ca3af', marginBottom: '0.25rem' }}>Local Average</div>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#fbbf24' }}>
-                    {averageLocalRating > 0 ? `⭐ ${averageLocalRating}` : '—'} 
-                    <span style={{ fontSize: '0.875rem', color: '#9ca3af', fontWeight: 'normal' }}> ({localReviews.length} reviews)</span>
-                  </div>
-                </div>
-
-                <div>
-                  <div style={{ fontSize: '0.875rem', color: '#9ca3af', marginBottom: '0.25rem' }}>Release Date</div>
-                  <div style={{ fontSize: '1.125rem', fontWeight: '600' }}>{movie.release_date}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <MovieDetailsHero
+          movie={movie}
+          averageLocalRating={averageLocalRating}
+          reviewCount={localReviews.length}
+        />
 
         {/* Reviews Sections */}
         <div>
           {/* TMDB Reviews */}
-          <section style={{ marginBottom: '3rem' }}>
-            <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', marginBottom: '1.5rem' }}>Global Reviews (from TMDB)</h2>
-
-            {tmdbReviews.length > 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {tmdbReviews.map((r) => (
-                  <div key={r.id} style={{ backgroundColor: '#1f2937', padding: '1.5rem', borderRadius: '1rem', border: '1px solid #374151' }}>
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                      <div style={{ width: '3rem', height: '3rem', borderRadius: '9999px', backgroundColor: '#374151', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '1.25rem', flexShrink: 0 }}>
-                        {r.author?.[0]?.toUpperCase() || "G"}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                          <div>
-                            <div style={{ fontWeight: '600', fontSize: '1.125rem' }}>{r.author}</div>
-                            <div style={{ fontSize: '0.875rem', color: '#9ca3af' }}>{new Date(r.created_at).toLocaleString()}</div>
-                          </div>
-                        </div>
-                        <p style={{ color: '#d1d5db', lineHeight: '1.75' }}>{r.content}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p style={{ color: '#9ca3af' }}>No global reviews available.</p>
-            )}
-          </section>
+          <TmdbReviews reviews={tmdbReviews} />
 
           {/* Local User Reviews */}
           <section>

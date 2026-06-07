@@ -216,24 +216,6 @@ export default function Favorites() {
             your collection
           </p>
         </div>
-
-        {/* Favorites Grid */}
-        {/* {favorites.length > 0 ? (
-          <FavoritesGrid
-            favorites={favorites}
-            onMovieClick={handleMovieClick}
-            onRemoveFavorite={handleRemoveFavorite}
-          />
-        ) : (
-          <EmptyState
-            icon="💔"
-            title="No favorites yet"
-            description="Start adding movies to your favorites and they will appear here"
-            actionLabel="Browse Movies"
-            onAction={() => navigate("/")}
-          />
-        )} */}
-
         {filteredFavorites.length > 0 ? (
           <FavoritesGrid
             favorites={filteredFavorites}
