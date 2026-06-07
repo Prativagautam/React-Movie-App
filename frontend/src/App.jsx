@@ -12,12 +12,13 @@ function App() {
     <AuthProvider> 
       <MovieProvider>
         {/* Removed NavBar - it's now integrated into each page */}
-     
-
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/movie/:id" element={<MovieDetails />} />
+          <Route path="/tv/:id" element={<MovieDetails />} />
+          {/* TODO: Add a fallback route */}
+          {/* <Route path="*" element={<NotFound />} /> */}
         </Routes>
       </MovieProvider>
     </AuthProvider>
@@ -25,5 +26,4 @@ function App() {
 }
 
 export default App
-
 
