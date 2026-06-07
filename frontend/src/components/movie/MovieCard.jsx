@@ -42,10 +42,17 @@ function MovieCard({ movie, contentType = "movie" }) {
   };
 
   return (
-    <Link to={getRoute()} className="block w-full" style={{ textDecoration: 'none', color: 'inherit' }}>
+    <Link
+      to={getRoute()}
+      className="block w-full"
+      style={{ textDecoration: "none", color: "inherit" }}
+    >
       <div className="w-full">
         {/* Poster Container with Fixed Aspect Ratio */}
-        <div className="relative w-full rounded-xl overflow-hidden mb-3 bg-gray-700" style={{ paddingBottom: '150%' }}>
+        <div
+          className="relative w-full rounded-xl overflow-hidden mb-3 bg-gray-700"
+          style={{ paddingBottom: "150%" }}
+        >
           {/* Poster Image */}
           {movie.poster_path ? (
             <img
@@ -58,20 +65,24 @@ function MovieCard({ movie, contentType = "movie" }) {
               No Image
             </div>
           )}
-          
+
           {/* Favorite Button Overlay */}
           <button
+            type="button"
             onClick={onFavoriteClick}
-            className={`absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center text-base transition-all z-10 backdrop-blur-sm border border-white/20 hover:scale-110 ${
-              favorite 
-                ? 'bg-red-500/90 hover:bg-red-600' 
-                : 'bg-black/30 hover:bg-black/50'
-            }`}
+            aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
+            className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center text-base transition-all z-10 hover:scale-110"
+            style={{
+              background: "rgba(0, 0, 0, 0.25)",
+              border: "none",
+              outline: "none",
+              appearance: "none",
+            }}
           >
-            {favorite ? '❤️' : '🤍'}
+            {favorite ? "❤️" : "🤍"}
           </button>
         </div>
-        
+
         {/* Content Info */}
         <div className="pt-1">
           <h3 className="font-semibold text-sm mb-1 overflow-hidden text-ellipsis whitespace-nowrap text-white">
@@ -79,7 +90,7 @@ function MovieCard({ movie, contentType = "movie" }) {
           </h3>
           <div className="flex items-center gap-2 text-xs text-gray-400">
             <span className="flex items-center gap-1">
-              ⭐ {movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'}
+              ⭐ {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"}
             </span>
             <span>•</span>
             <span>{getYear()}</span>
