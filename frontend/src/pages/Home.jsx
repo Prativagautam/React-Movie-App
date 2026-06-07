@@ -61,9 +61,9 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   
-  // Movie states
-  const [movies, setMovies] = useState([]);
-  const [featuredMovies, setFeaturedMovies] = useState([]);
+  // Content states
+  const [contentItems, setContentItems] = useState([]);
+  const [featuredContent, setFeaturedContent] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -95,7 +95,7 @@ export default function Home() {
 
         if (trimmedQuery) {
           content = await searchContent(activeTab, trimmedQuery);
-          setFeaturedMovies([]);
+          setFeaturedContent([]);
         } else {
           const genreMap = getGenreMapForTab(activeTab);
           const genreId = genreMap[activeGenre] ?? null;
@@ -106,10 +106,10 @@ export default function Home() {
             content = await getContentByGenre(activeTab, genreId);
           }
 
-          setFeaturedMovies(content.slice(0, 2));
+          setFeaturedContent(content.slice(0, 2));
         }
 
-        setMovies(content);
+        setContentItems(content);
         setError(null);
       } catch (err) {
         console.error(err);
@@ -389,10 +389,10 @@ export default function Home() {
       {/* Main Content */}
       <main style={{ padding: '2rem 1rem', maxWidth: '1280px', margin: '0 auto' }}>
         {/* Featured Section */}
-        {!searchQuery && featuredMovies.length > 0 && (
+        {!searchQuery && featuredContent.length > 0 && (
           <section style={{ marginBottom: '3rem' }}>
             <div className="featured-grid" style={{ display: 'grid', gap: '1.5rem' }}>
-              {featuredMovies.map((movie) => (
+              {featuredContent.map((movie) => (
                 <div
                   key={movie.id}
                   onClick={() => handleMovieClick(movie.id)}
@@ -489,7 +489,7 @@ export default function Home() {
               {searchQuery ? `Search Results for "${debouncedQuery}"` : `Trending in ${activeGenre}`}
             </h2>
             {searchQuery && !loading && (
-              <p style={{ color: '#9ca3af', fontSize: '0.875rem' }}>{movies.length} movies found</p>
+              <p style={{ color: '#9ca3af', fontSize: '0.875rem' }}>{contentItems.length} movies found</p>
             )}
           </div>
         </section>
@@ -512,10 +512,10 @@ export default function Home() {
         )}
 
         {/* Movie Grid - Equal poster sizes with favorite buttons */}
-        {!loading && movies.length > 0 && (
+        {!loading && contentItems.length > 0 && (
   <section>
     <div className="flex flex-wrap gap-6 md:gap-8">
-      {movies.map((movie) => (
+      {contentItems.map((movie) => (
         <div key={movie.id} className="w-[140px] md:w-[180px] flex-shrink-0">
           <MovieCard 
             movie={movie} 
@@ -527,7 +527,7 @@ export default function Home() {
   </section>
 )}     
         {/* No Results */}
-        {!loading && movies.length === 0 && searchQuery && (
+        {!loading && contentItems.length === 0 && searchQuery && (
           <div style={{ textAlign: 'center', padding: '5rem 0' }}>
             <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎬</div>
             <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>No movies found</h3>
