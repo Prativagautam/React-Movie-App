@@ -1,22 +1,20 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useMovieContext } from "../contexts/MovieContext";
 import AuthModal from "../components/auth/Authmodal";
 import { Search } from "lucide-react";
-import { 
-  searchMovies, 
-  getPopularMovies, 
+import {
+  searchMovies,
+  getPopularMovies,
   getMoviesByGenre,
   getPopularTVSeries,
   searchTVSeries,
-  getTVSeriesByGenre 
+  getTVSeriesByGenre
 } from "../services/api";
 import MovieCard from "../components/movie/MovieCard";
-
+import GenreFilter from "../components/movie/GenreFilter";
 const CONTENT_TABS = ["Movie", "Series", "Originals"];
-
 const MOVIE_GENRES = {
   Trending: null,
   Action: 28,
@@ -163,67 +161,67 @@ export default function Home() {
               <span style={{ color: 'white' }}>Movie</span>
               <span style={{ color: '#3b82f6' }}>.id</span>
             </div>
-           {/* Desktop Navigation */}
-<nav className="hidden desktop-nav">
-  <div className="flex items-center gap-2">
-    {CONTENT_TABS.map((tab) => (
-      <button
-        key={tab}
-        onClick={() => setActiveTab(tab)}
-        className="px-6 py-3 rounded-full text-center text-sm font-medium border border-white/30 transition-all duration-300 backdrop-blur-sm hover:bg-white/20 hover:text-white"
-        style={{
-          backgroundColor: activeTab === tab ? 'rgba(184, 168, 168, 0.25)' : 'rgba(59, 59, 79, 0.19)',
-          color: activeTab === tab ? 'white' : 'rgba(255, 255, 255, 0.8)',
-          transform: activeTab === tab ? 'scale(1.05)' : 'scale(1)',
-          boxShadow: activeTab === tab ? '0 4px 15px rgba(0, 0, 0, 0.2)' : 'none'
-        }}
-      >
-        {tab}
-      </button>
-    ))}
-    
-    {/* sliding search */}
-    <div className="relative ml-2">
-      {!searchOpen ? (
-        <button
-          onClick={() => setSearchOpen(true)}
-          className="px-4 py-3 rounded-full text-center text-sm font-medium border border-white/30 transition-all duration-300 backdrop-blur-sm hover:bg-white/20 hover:scale-105"
-          style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            color: 'rgba(255, 255, 255, 0.8)'
-          }}
-        >
-          <Search size={20} className="text-white" />
-        </button>
-      ) : (
-        <div className="flex items-center bg-gray-900/50 border border-white/30 rounded-full overflow-hidden search-slide-in backdrop-blur-sm">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search..."
-            className="w-[250px] px-4 py-2.5 bg-transparent text-white placeholder-gray-400 border-none outline-none"
-            autoFocus
-            onBlur={() => {
-              if (!searchQuery) {
-                setTimeout(() => setSearchOpen(false), 150);
-              }
-            }}
-          />
-          <button
-            onClick={() => {
-              setSearchQuery("");
-              setSearchOpen(false);
-            }}
-            className="px-3 py-2.5 border-none bg-transparent cursor-pointer transition-colors duration-300 hover:bg-white/10"
-          >
-            <Search size={18} className="text-gray-400" />
-          </button>
-        </div>
-      )}
-    </div>
-  </div>
-</nav>
+            {/* Desktop Navigation */}
+            <nav className="hidden desktop-nav">
+              <div className="flex items-center gap-2">
+                {CONTENT_TABS.map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className="px-6 py-3 rounded-full text-center text-sm font-medium border border-white/30 transition-all duration-300 backdrop-blur-sm hover:bg-white/20 hover:text-white"
+                    style={{
+                      backgroundColor: activeTab === tab ? 'rgba(184, 168, 168, 0.25)' : 'rgba(59, 59, 79, 0.19)',
+                      color: activeTab === tab ? 'white' : 'rgba(255, 255, 255, 0.8)',
+                      transform: activeTab === tab ? 'scale(1.05)' : 'scale(1)',
+                      boxShadow: activeTab === tab ? '0 4px 15px rgba(0, 0, 0, 0.2)' : 'none'
+                    }}
+                  >
+                    {tab}
+                  </button>
+                ))}
+
+                {/* Sliding Search */}
+                <div className="relative ml-2">
+                  {!searchOpen ? (
+                    <button
+                      onClick={() => setSearchOpen(true)}
+                      className="px-4 py-3 rounded-full text-center text-sm font-medium border border-white/30 transition-all duration-300 backdrop-blur-sm hover:bg-white/20 hover:scale-105"
+                      style={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        color: 'rgba(255, 255, 255, 0.8)'
+                      }}
+                    >
+                      <Search size={20} className="text-white" />
+                    </button>
+                  ) : (
+                    <div className="flex items-center bg-gray-900/50 border border-white/30 rounded-full overflow-hidden search-slide-in backdrop-blur-sm">
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search..."
+                        className="w-[250px] px-4 py-2.5 bg-transparent text-white placeholder-gray-400 border-none outline-none"
+                        autoFocus
+                        onBlur={() => {
+                          if (!searchQuery) {
+                            setTimeout(() => setSearchOpen(false), 150);
+                          }
+                        }}
+                      />
+                      <button
+                        onClick={() => {
+                          setSearchQuery("");
+                          setSearchOpen(false);
+                        }}
+                        className="px-3 py-2.5 border-none bg-transparent cursor-pointer transition-colors duration-300 hover:bg-white/10"
+                      >
+                        <Search size={18} className="text-gray-400" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </nav>
 
             {/* Mobile Menu Button */}
             <button
@@ -451,37 +449,14 @@ export default function Home() {
         )}
 
         {/* Genre Filter */}
-         {/* Genre Filter */}
-      {!searchQuery && (
-  <section className="mb-8">
-    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2 w-full">
-      {genres.map((genre) => {
-        const isActive = activeGenre === genre;
-        return (
-          <button
-            key={genre}
-            onClick={() => setActiveGenre(genre)}
-            className="
-              px-4 py-3 rounded-full text-center text-sm font-medium 
-              border border-white/30 transition-all duration-300
-              backdrop-blur-sm
-              hover:bg-white/20 hover:text-white
-              disabled:opacity-50
-            "
-            style={{
-              backgroundColor: isActive ? 'rgba(71, 69, 69, 0.25)' : 'rgba(255, 255, 255, 0.1)',
-              color: isActive ? 'white' : 'rgba(255, 255, 255, 0.8)',
-              transform: isActive ? 'scale(1.05)' : 'scale(1)',
-              boxShadow: isActive ? '0 4px 15px rgba(0, 0, 0, 0.2)' : 'none'
-            }}
-          >
-            {genre}
-          </button>
-        );
-      })}
-    </div>
-  </section>
-)}
+        {!searchQuery && (
+         <GenreFilter
+         genres={genres}
+         activeGenre={activeGenre}
+         onGenreChange={setActiveGenre}         
+         />
+        )}
+
         {/* Results Header */}
         <section style={{ marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -513,19 +488,20 @@ export default function Home() {
 
         {/* Movie Grid - Equal poster sizes with favorite buttons */}
         {!loading && contentItems.length > 0 && (
-  <section>
-    <div className="flex flex-wrap gap-6 md:gap-8">
-      {contentItems.map((movie) => (
-        <div key={movie.id} className="w-[140px] md:w-[180px] flex-shrink-0">
-          <MovieCard 
-            movie={movie} 
-            contentType={activeTab}
-          />
-        </div>
-      ))}
-    </div>
-  </section>
-)}     
+          <section>
+            <div className="flex flex-wrap gap-6 md:gap-8">
+              {contentItems.map((movie) => (
+                <div key={movie.id} className="w-[140px] md:w-[180px] flex-shrink-0">
+                  <MovieCard 
+                    movie={movie} 
+                    contentType={activeTab}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* No Results */}
         {!loading && contentItems.length === 0 && searchQuery && (
           <div style={{ textAlign: 'center', padding: '5rem 0' }}>
