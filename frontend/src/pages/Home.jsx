@@ -17,6 +17,7 @@ import { FeaturedContent } from "../components/movie/FeaturedContent";
 import LoadingState from "../components/common/loadingState";
 import ErrorMessage from "../components/common/ErrorMessage";
 import { ContentGrid } from "../components/movie/ContentGrid";
+import { EmptyState } from "../components/common/EmptyState";
 const CONTENT_TABS = ["Movie", "Series", "Originals"];
 const MOVIE_GENRES = {
   Trending: null,
@@ -696,22 +697,13 @@ export default function Home() {
         )}
 
         {/* No Results */}
-        {!loading && contentItems.length === 0 && searchQuery && (
-          <div style={{ textAlign: "center", padding: "5rem 0" }}>
-            <div style={{ fontSize: "4rem", marginBottom: "1rem" }}>🎬</div>
-            <h3
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: "bold",
-                marginBottom: "0.5rem",
-              }}
-            >
-              No movies found
-            </h3>
-            <p style={{ color: "#9ca3af" }}>
-              Try searching with different keywords
-            </p>
-          </div>
+        {!loading && contentItems.length === 0 && debouncedQuery && (
+          <EmptyState
+            icon="🎬"
+            iconSize="4rem"
+            title="No movies found"
+            description="Try searching with different keywords"
+          />
         )}
       </main>
       <style>{`
