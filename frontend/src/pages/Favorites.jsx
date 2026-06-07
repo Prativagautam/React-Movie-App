@@ -3,7 +3,13 @@ import { useAuth } from "../contexts/AuthContext";
 import { useMovieContext } from "../contexts/MovieContext";
 import AuthModal from "../components/auth/Authmodal";
 import { EmptyState } from "../components/common/EmptyState";
+import { useState } from "react";
+import { SlidingSearch } from "../components/common/SlidingSearch";
+import { FavoritesGrid } from "../components/favorites/FavoritesGrid";
+
 export default function Favorites() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
   const navigate = useNavigate();
   const { user, openAuth, logout } = useAuth();
   const { favorites, removeFromFavorites } = useMovieContext();
@@ -16,6 +22,10 @@ export default function Favorites() {
     e.stopPropagation();
     removeFromFavorites(movieId);
   };
+  const filteredFavorites = favorites.filter((movie) => {
+    const title = movie.title || movie.name || "";
+    return title.toLowerCase().includes(searchQuery.trim().toLowerCase());
+  });
 
   return (
     <div
@@ -168,15 +178,39 @@ export default function Favorites() {
       >
         {/* Header Section */}
         <div style={{ marginBottom: "2rem" }}>
-          <h1
+          <div
             style={{
-              fontSize: "2.5rem",
-              fontWeight: "bold",
-              marginBottom: "0.5rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "1rem",
             }}
           >
-            My Favorites ❤️
-          </h1>
+            <div>
+              <h1
+                style={{
+                  fontSize: "2.5rem",
+                  fontWeight: "bold",
+                  marginBottom: "0.5rem",
+                }}
+              >
+                My Favorites ❤️
+              </h1>
+              {/* <p style={{ color: "#9ca3af", fontSize: "1rem" }}>
+                {filteredFavorites.length} of {favorites.length} movies in your
+                collection
+              </p> */}
+            </div>
+
+            <SlidingSearch
+              value={searchQuery}
+              onChange={setSearchQuery}
+              isOpen={searchOpen}
+              onOpen={() => setSearchOpen(true)}
+              onClose={() => setSearchOpen(false)}
+              placeholder="Search favorites..."
+            />
+          </div>
           <p style={{ color: "#9ca3af", fontSize: "1rem" }}>
             {favorites.length} {favorites.length === 1 ? "movie" : "movies"} in
             your collection
@@ -184,7 +218,7 @@ export default function Favorites() {
         </div>
 
         {/* Favorites Grid */}
-        {favorites.length > 0 ? (
+        {/* {favorites.length > 0 ? (
           <FavoritesGrid
             favorites={favorites}
             onMovieClick={handleMovieClick}
@@ -197,6 +231,26 @@ export default function Favorites() {
             description="Start adding movies to your favorites and they will appear here"
             actionLabel="Browse Movies"
             onAction={() => navigate("/")}
+          />
+        )} */}
+
+        {filteredFavorites.length > 0 ? (
+          <FavoritesGrid
+            favorites={filteredFavorites}
+            onMovieClick={handleMovieClick}
+            onRemoveFavorite={handleRemoveFavorite}
+          />
+        ) : (
+          <EmptyState
+            icon={searchQuery ? "🎬" : "💔"}
+            title={searchQuery ? "No matching favorites" : "No favorites yet"}
+            description={
+              searchQuery
+                ? "Try searching with a different title"
+                : "Start adding movies to your favorites and they will appear here"
+            }
+            actionLabel={searchQuery ? undefined : "Browse Movies"}
+            onAction={searchQuery ? undefined : () => navigate("/")}
           />
         )}
       </main>

@@ -1,4 +1,4 @@
-function FavoritesGrid({ favorites, onMovieClick, onRemoveFavorite }) {
+export function FavoritesGrid({ favorites, onMovieClick, onRemoveFavorite }) {
   return (
     <div className="movie-grid" style={{ display: "grid", gap: "1rem" }}>
       {favorites.map((movie) => (
@@ -147,4 +147,4 @@ function FavoritesGrid({ favorites, onMovieClick, onRemoveFavorite }) {
   );
 }
 
-export default FavoritesGrid;
+
