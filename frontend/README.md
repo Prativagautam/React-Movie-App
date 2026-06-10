@@ -6,8 +6,7 @@ A responsive movie and TV discovery application built with React, Vite, and the 
 
 Deployed with Vercel.
 
-> Add your production URL here after deployment, for example:
-> `https://your-project-name.vercel.app`
+https://react-movie-app-prativa1.vercel.app/
 
 ## Features
 
