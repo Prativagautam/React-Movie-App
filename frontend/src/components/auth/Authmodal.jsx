@@ -1,7 +1,6 @@
-
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function AuthModal() {
   const { authModalOpen, authMode, closeAuth, login, signup, setAuthMode } = useAuth();
@@ -43,11 +42,12 @@ export default function AuthModal() {
             <h2 className="text-3xl font-bold text-white mb-3 tracking-tight">
               {authMode === 'login' ? 'Welcome Back' : 'Create Account'}
             </h2>
-            <p className="text-gray-400 text-sm">
+            <br></br>
+            {/* <p className="text-gray-400 text-sm mt-7 ">
               {authMode === 'login' 
                 ? 'Please enter your credentials to continue' 
                 : 'Sign up to get started with us'}
-            </p>
+            </p> */}
           </div>
 
           {/* Form */}
@@ -56,7 +56,7 @@ export default function AuthModal() {
 
             {/* Username Field - Only for Signup */}
             {authMode === 'signup' && (
-              <div>
+              <div className='mt-5'>
                 <input
                   {...register('username', { required: 'Username is required' })}
                   placeholder="     Username"
